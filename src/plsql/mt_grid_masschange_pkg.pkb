@@ -34,7 +34,7 @@ as
     l_do_save := ( p_dynamic_action.attribute_03 = 'Y' );
     
     l_return.javascript_function :=
-      'mtag.grid.masschange.init(' || ')'
+      'mtag.grid.masschange'
     ;
 
     l_return.attribute_01 := p_dynamic_action.attribute_01;

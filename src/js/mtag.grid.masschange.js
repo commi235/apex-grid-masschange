@@ -1,49 +1,51 @@
 /*global apex */
 
 var mtag = mtag || {};
+mtag.grid = mtag.grid || {};
 
 (function($, region, item, grid){
 
-  var _region, _fields, _items, _execSave;
-
-  function _init( regionId, fields, items, execSave ) {
-    _region   = region( regionId );
-    _fields   = fields;
-    _items    = items;
-    _execSave = execSave;
-  }
-
-  function _exec() {
-    var currentModel = _region.call("getCurrentView").model;
-    if ( !currentModel ) {
-      console.error( "No model found on region!", _region);
+  function _exec( pRegionId, pItems, pColumns, pDoSave ) {
+    var lRegion = region( pRegionId );
+    var lCurrentModel = lRegion.call("getCurrentView").model;
+    if ( !lCurrentModel ) {
+      console.error( "No model found on region!", lRegion);
     } else {
-      var selectedRecords = _region.call("getSelectedRecords");
+      var lSelectedRecords = lRegion.call("getSelectedRecords");
 
-      if ( selectedRecords.length > 0 ) {
-        var itemValues = [];
-        for (let index = 0; index < _items.length; index++) {
-          itemValues[index] = item( _items[index] ).getValue();          
+      if ( lSelectedRecords.length > 0 ) {
+
+        var lItemValues = [];
+        for (let index = 0; index < pItems.length; index++) {
+          lItemValues[index] = item( pItems[index] ).getValue();          
         }
 
-        selectedRecords.each( function(){
-          let curRecordId = currentModel.getRecordId( this );
-          for (let index = 0; index < fields.length; index++) {
-            currentModel.setRecordValue( curRecordId, fields[index], itemValues[index]);
+        for (let index = 0; index < lSelectedRecords.length; index++) {
+          let lRecordId = lCurrentModel.getRecordId( lSelectedRecords[index] );
+          for (let index = 0; index < pColumns.length; index++) {
+            lCurrentModel.setRecordValue( lRecordId, pColumns[index], lItemValues[index]);
           }
-        });
+        }
+
       } else {
         console.warn( "No selected records found." );
       }
-      if ( _execSave ) {
-        _region.call("getActions").invoke("save");
+      if ( pDoSave ) {
+        lRegion.call("getActions").invoke("save");
       }
     }
   }
 
-  grid.masschange = {
-    init : _init,
-    exec : _exec
-  };
+  grid.masschange = function( pContext ) {
+
+    var lRegionId = this.action.affectedRegionId,
+        lItems    = this.action.attribute01.split(","),
+        lColumns  = this.action.attribute02.split(","),
+        lDoSave   = (this.action.attribute03 == "Y");
+
+    _exec( lRegionId, lItems, lColumns, lDoSave );
+    
+  }
+
   mtag.grid = grid;
-})(apex.jQuery, apex.region, apex.item, mtag.grid || {})
+})(apex.jQuery, apex.region, apex.item, mtag.grid)
