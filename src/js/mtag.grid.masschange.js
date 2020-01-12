@@ -7,11 +7,11 @@ mtag.grid = mtag.grid || {};
 
   function _exec( pRegionId, pItems, pColumns, pDoSave ) {
     var lRegion = region( pRegionId );
-    var lCurrentModel = lRegion.call("getCurrentView").model;
+    var lCurrentModel = lRegion.call( "getCurrentView" ).model;
     if ( !lCurrentModel ) {
       console.error( "No model found on region!", lRegion);
     } else {
-      var lSelectedRecords = lRegion.call("getSelectedRecords");
+      var lSelectedRecords = lRegion.call( "getSelectedRecords" );
 
       if ( lSelectedRecords.length > 0 ) {
 
@@ -23,26 +23,31 @@ mtag.grid = mtag.grid || {};
         for (let index = 0; index < lSelectedRecords.length; index++) {
           let lRecordId = lCurrentModel.getRecordId( lSelectedRecords[index] );
           for (let index = 0; index < pColumns.length; index++) {
-            lCurrentModel.setRecordValue( lRecordId, pColumns[index], lItemValues[index]);
+            if ( lCurrentModel.getFieldKey( pColumns[index] ) ) {
+              lCurrentModel.setRecordValue( lRecordId, pColumns[index], lItemValues[index]);              
+            } else {
+              console.warn( "Unknown field.", pColumns[index] );
+            }
           }
         }
-
       } else {
         console.warn( "No selected records found." );
       }
       if ( pDoSave ) {
-        lRegion.call("getActions").invoke("save");
+        lRegion.call( "getActions" ).invoke( "save" );
       }
     }
   }
 
-  grid.masschange = function( pContext ) {
+  grid.masschange = function() {
 
-    var lRegionId = this.action.affectedRegionId,
-        lItems    = this.action.attribute01.split(","),
-        lColumns  = this.action.attribute02.split(","),
-        lDoSave   = (this.action.attribute03 == "Y");
+    var lRegionId =   this.action.affectedRegionId,
+        lItems    =   this.action.attribute01.split(","),
+        lAutoMap  =   this.action.attribute02, // only included to have complete settings. Not used.
+        lColumns  =   this.action.attribute03.split(","),
+        lDoSave   = ( this.action.attribute04 == "Y" );
 
+    apex.debug.trace( "Settings used", lRegionId, lItems, lAutoMap, lColumns, lDoSave );
     _exec( lRegionId, lItems, lColumns, lDoSave );
     
   }
