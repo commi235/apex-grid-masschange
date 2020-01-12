@@ -27,7 +27,7 @@
         "internalName" : "COM.MT-AG.APEX.GRID-MASSCHANGE",
         "type" : "dynamic action",
         "demo" : "https://apex.oracle.com/pls/apex/f?p=119217",
-        "previewImage" : "https://github.com/commi235/apex-grid-masschange/blob/master/mtag_grid_masschange_demo.gif"
+        "previewImage" : "https://raw.githubusercontent.com/commi235/apex-grid-masschange/master/mtag_grid_masschange_demo.gif"
       }
     }
   }
